@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -13,34 +14,41 @@ namespace SnakeAdri
     public class Snake
     {
         #region Attributs privés
-        private Brush _couleursnake = Brushes.Green;
-        private Brush _couleurtetesnake = Brushes.Red;
+        //Liste de poitn afin de gérer la logique du jeux
+        private List<Point> bonusPoints = new List<Point>();
+        private List<Point> _serpentpoints = new List<Point>();
+
+        private Brush _couleurserpent = Brushes.Green;
+        private Brush _couleurteteserpent = Brushes.Red;
 
         private Random _rnd = new Random();
 
         private Point _pointdedepart;
-
-        private int _tailletete = 8; //(int)SIZE.THICK;
-
-        private Canvas _snakecanvas = new Canvas();
-
         private Point _positioncourante = new Point();
-        private enum MOVINGDIRECTION
+        private Point _positiontete;
+
+        private int _tailleelements = 8; //(int)SIZE.THICK;
+
+        private int _longueurserpent = 5;
+
+        private int _direction = 0;
+
+        private int _directionPrecedente = 0;
+
+        private Canvas _serpentcanvas = new Canvas();
+
+
+        private enum _deplacement
         {
-            UPWARDS = 8,
-            DOWNWARDS = 2,
-            TOLEFT = 4,
-            TORIGHT = 6
+            HAUT = 8,
+            BAS = 2,
+            GAUCHE = 4,
+            DROITE = 6
         };
 
         #endregion
 
         #region Attributs public
-        public Point PositionCourante
-        {
-            get { return _positioncourante; }
-            set { _positioncourante = value; }
-        }
 
         #endregion
         // J'ai mis les autres vitesse en commentaire. Celle-ci sont simplement impossible avec un movement de += 10.
@@ -53,64 +61,155 @@ namespace SnakeAdri
         public Snake()
         {
             //Génére le point de départ du serpent
-            _pointdedepart = new Point(_rnd.Next(10, 640), _rnd.Next(10, 440));
+            _pointdedepart = new Point(_rnd.Next(20, 630), _rnd.Next(20, 400));
 
             //On défini la position courante à la position de départ lors de la construction du snake
-            _positioncourante = _pointdedepart;
+            _positiontete = _pointdedepart;
+            _positioncourante = new Point(_pointdedepart.X-8, _pointdedepart.Y);
         }
+
         /// <summary>
-        /// Permet d'afficher le serpent dans le canvas
+        /// Permet d'afficher le serpent dans le canvas à une position donnée
         /// </summary>
         /// <param name="levelcanvas">Canvas de la fenêtre</param>
         public void AfficherSnake(Canvas levelcanvas)
         {
 
             //Paramètrage de la tête du serpent
-            Rectangle tete = new Rectangle();
-            tete.Fill = _couleurtetesnake;
-            tete.Width = _tailletete;
-            tete.Height = _tailletete;
+            Rectangle tete = new Rectangle
+            {
+                Fill = _couleurteteserpent,
+                Width = _tailleelements,
+                Height = _tailleelements
+            };
 
-            Canvas.SetTop(tete, _positioncourante.Y);
-            Canvas.SetLeft(tete, _positioncourante.X);
+            Canvas.SetTop(tete, _positiontete.Y);
+            Canvas.SetLeft(tete, _positiontete.X);
 
             //Paramètrage du du serpent
-            Ellipse corp = new Ellipse();
-            corp.Fill = _couleursnake;
-            corp.Width = _tailletete;
-            corp.Height = _tailletete;
+            Ellipse corp = new Ellipse
+            {
+                Fill = _couleurserpent,
+                Width = _tailleelements,
+                Height = _tailleelements
+            };
 
             Canvas.SetTop(corp, _positioncourante.Y);
-            Canvas.SetLeft(corp, _positioncourante.X-8);
+            Canvas.SetLeft(corp, _positioncourante.X);
 
             //Intégration de la tête et du courp du serpent 
             levelcanvas.Children.Add(tete);
             levelcanvas.Children.Add(corp);
 
-            int count = levelcanvas.Children.Count;
+            if (_positioncourante == _positiontete)
+            {
+                levelcanvas.Children.Remove(tete);
+            }
 
-            // snakePoints.Add(currentposition);
+            //ajout du serpent dans la liste de points (logique du jeux)
+            _serpentpoints.Add(_positioncourante);
 
-            //if (count > length)
+            //int nbrelementserpent = levelcanvas.Children.Count;
+
+            //if (nbrelementserpent > _longueurserpent)
             //{
-            //    paintCanvas.Children.RemoveAt(count - length);
-            //    snakePoints.RemoveAt(count - length);
+            //    levelcanvas.Children.RemoveAt(nbrelementserpent - _longueurserpent);
+            //    _serpentpoints.RemoveAt(nbrelementserpent - _longueurserpent);
             //}
 
         }
 
+        public void timer_Tick(object sender, EventArgs e, Canvas levelcanvas)
+        {
+            //Console.WriteLine("tick tack !" + _longueurserpent++);
+            /* Changer la valeur de base 1 vers 10. Ceci nous permet de bouger le snake sans pouvoir nous manger la tête comme dans la version de base. On bouge
+             * donc comme si le tableau était fait de carré. Comme dans un vrai jeu de Snake. */
+            switch (_direction)
+            {
+                case (int)_deplacement.BAS:
+                    _positioncourante = _positiontete;
+                    _positiontete.Y += 8;
+                    AfficherSnake(levelcanvas);
+                    break;
+                case (int)_deplacement.HAUT:
+                    _positioncourante.Y -= 8;
+                    AfficherSnake(levelcanvas);
+                    break;
+                case (int)_deplacement.GAUCHE:
+                    _positioncourante.X -= 8;
+                    AfficherSnake(levelcanvas);
+                    break;
+                case (int)_deplacement.DROITE:
+                    _positioncourante.X += 8;
+                    AfficherSnake(levelcanvas);
+                    break;
+            }
 
-        //private int direction = 0;
+            //// changement de (currentPosition.Y > 380) à (currentPosition.Y > 375) car le snake pouvait sortir son corp de la moitié en dehors des limites du tableau lorsqu'il allait en bas. 
+            //if ((currentPosition.X < 5) || (currentPosition.X > 620) ||
+            //    (currentPosition.Y < 5) || (currentPosition.Y > 375))
+            //    GameOver();
 
-        //private int previousDirection = 0;
+            //int n = 0;
+            //foreach (Point point in bonusPoints)
+            //{
 
-        //private int headSize = (int)SIZE.THICK;
+            //    if ((Math.Abs(point.X - currentPosition.X) < headSize) &&
+            //        (Math.Abs(point.Y - currentPosition.Y) < headSize))
+            //    {
+            //        // Modifier la "Length" du snake à 10. Cela permet de commencer avec une longueur de base acceptable.
+            //        length += 10;
+            //        score += 10;
 
+            //        bonusPoints.RemoveAt(n);
+            //        paintCanvas.Children.RemoveAt(n);
+            //        paintBonus(n);
+            //        break;
+            //    }
+            //    n++;
+            //}
 
+            ///* Lorsque je changeais les mouvement vers 10 (voir plus haut), l'ancien calcule permettais de passé au travers de notre corp et si notre excécution était très rapide,
+            //nous pouvions simplement passé au travers de notre corp tout entier en ligne bien droite. Maintenant, un input bien placé comme celle-ci nous fera perdre, ce qui est logique. 
 
-        //private int length = 10;
-        //private int score = 0;
+            // Bref, headSize*2 remplacé par -1 pour une mort instantanné sur n'importe quelle partie du snake.*/
+            //for (int q = 0; q < (snakePoints.Count - 1); q++)
+            //{
+            //    Point point = new Point(snakePoints[q].X, snakePoints[q].Y);
+            //    if ((Math.Abs(point.X - currentPosition.X) < (headSize)) &&
+            //         (Math.Abs(point.Y - currentPosition.Y) < (headSize)))
+            //    {
+            //        GameOver();
+            //        break;
+            //    }
+            //}
+        }
 
+        public void OnAppuieSurTouche(object sender, KeyEventArgs e)
+        {
+
+            switch (e.Key)
+            {
+                case Key.Down:
+                    if (_directionPrecedente != (int)_deplacement.HAUT)
+                        _direction = (int)_deplacement.BAS;
+                    break;
+                case Key.Up:
+                    if (_directionPrecedente != (int)_deplacement.BAS)
+                        _direction = (int)_deplacement.HAUT;
+                    break;
+                case Key.Left:
+                    if (_directionPrecedente != (int)_deplacement.DROITE)
+                        _direction = (int)_deplacement.GAUCHE;
+                    break;
+                case Key.Right:
+                    if (_directionPrecedente != (int)_deplacement.GAUCHE)
+                        _direction = (int)_deplacement.DROITE;
+                    break;
+            }
+            _directionPrecedente = _direction;
+
+        }
 
     }
 }

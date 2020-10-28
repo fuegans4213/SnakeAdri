@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace SnakeAdri
 {
@@ -27,10 +28,17 @@ namespace SnakeAdri
             //Création du serpent
             Snake snakegame = new Snake();
 
+            DispatcherTimer timer = new DispatcherTimer();
+
+            timer.Tick += new EventHandler((sender, e) => snakegame.timer_Tick(sender, e, levelcanvas));
+
+            timer.Interval = new TimeSpan(1000000); ;
+            timer.Start();
+
+            this.KeyDown += new KeyEventHandler((sender, e) => snakegame.OnAppuieSurTouche(sender, e));
             //Affichage du Snake intialement
             snakegame.AfficherSnake(levelcanvas);
-
-
+   
         }
     }
 }

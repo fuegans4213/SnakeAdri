@@ -13,7 +13,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Canvas Name="levelcanvas"
-                Grid.Column="1" HorizontalAlignment="Stretch" MaxWidth="650" MaxHeight="450">
+                Grid.Column="1" HorizontalAlignment="Stretch" MaxWidth="650" MaxHeight="420">
             <Canvas.Background>
                 <ImageBrush ImageSource="/Ressource/texture_sable.jpg" />
             </Canvas.Background>
