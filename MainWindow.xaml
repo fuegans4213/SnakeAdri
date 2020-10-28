@@ -1,0 +1,22 @@
+﻿<Window x:Class="SnakeAdri.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SnakeAdri"
+        xmlns:s="clr-namespace:SnakeAdri"
+        mc:Ignorable="d"
+        Title="SnakeAdri" Height="450" Width="650">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Canvas Name="levelcanvas"
+                Grid.Column="1" HorizontalAlignment="Stretch" MaxWidth="650" MaxHeight="450">
+            <Canvas.Background>
+                <ImageBrush ImageSource="/Ressource/texture_sable.jpg" />
+            </Canvas.Background>
+        </Canvas>
+    </Grid>
+</Window>
