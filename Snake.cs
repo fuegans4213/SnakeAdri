@@ -97,25 +97,29 @@ namespace SnakeAdri
             Canvas.SetTop(corp, _positioncourante.Y);
             Canvas.SetLeft(corp, _positioncourante.X);
 
-            //Intégration de la tête et du courp du serpent 
-            levelcanvas.Children.Add(tete);
+
+            int nbrelementserpent = levelcanvas.Children.Count;
+
+            //Je supprime la tête du serpent si elle existe ,pour l'afficher à la position suivante 
+            if ((nbrelementserpent > 0) && (levelcanvas.Children[0] is System.Windows.Shapes.Rectangle))
+            {
+               levelcanvas.Children.RemoveAt(0);
+            }
+
+            levelcanvas.Children.Insert(0,tete);
             levelcanvas.Children.Add(corp);
 
-            if (_positioncourante == _positiontete)
-            {
-                levelcanvas.Children.Remove(tete);
-            }
+
 
             //ajout du serpent dans la liste de points (logique du jeux)
             _serpentpoints.Add(_positioncourante);
 
-            //int nbrelementserpent = levelcanvas.Children.Count;
-
-            //if (nbrelementserpent > _longueurserpent)
-            //{
-            //    levelcanvas.Children.RemoveAt(nbrelementserpent - _longueurserpent);
-            //    _serpentpoints.RemoveAt(nbrelementserpent - _longueurserpent);
-            //}
+            //On supprime un élément du serpent si on dépasse la taille du serpent
+            if (nbrelementserpent > _longueurserpent)
+            {
+                levelcanvas.Children.RemoveAt(nbrelementserpent - _longueurserpent);
+                _serpentpoints.RemoveAt(nbrelementserpent - _longueurserpent);
+            }
 
         }
 
@@ -132,15 +136,18 @@ namespace SnakeAdri
                     AfficherSnake(levelcanvas);
                     break;
                 case (int)_deplacement.HAUT:
-                    _positioncourante.Y -= 8;
+                    _positioncourante = _positiontete;
+                    _positiontete.Y -= 8;
                     AfficherSnake(levelcanvas);
                     break;
                 case (int)_deplacement.GAUCHE:
-                    _positioncourante.X -= 8;
+                    _positioncourante = _positiontete;
+                    _positiontete.X -= 8;
                     AfficherSnake(levelcanvas);
                     break;
                 case (int)_deplacement.DROITE:
-                    _positioncourante.X += 8;
+                    _positioncourante = _positiontete;
+                    _positiontete.X += 8;
                     AfficherSnake(levelcanvas);
                     break;
             }
