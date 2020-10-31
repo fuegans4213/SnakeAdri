@@ -28,17 +28,21 @@ namespace SnakeAdri
             //Création du serpent
             Snake snakegame = new Snake();
 
-            DispatcherTimer timer = new DispatcherTimer();
+            DispatcherTimer GameTimer = new DispatcherTimer();
 
-            timer.Tick += new EventHandler((sender, e) => snakegame.timer_Tick(sender, e, levelcanvas));
+            GameTimer.Tick += new EventHandler((sender, e) => snakegame.Snaketimer(sender, e, levelcanvas));
 
-            timer.Interval = new TimeSpan(1000000); ;
-            timer.Start();
+            GameTimer.Interval = new TimeSpan(900000); ;
+            GameTimer.Start();
 
             this.KeyDown += new KeyEventHandler((sender, e) => snakegame.OnAppuieSurTouche(sender, e));
-            //Affichage du Snake intialement
+
+            //Affichage du Snake initialement
             snakegame.AfficherSnake(levelcanvas);
-   
+            //On insert le premier Fruit 
+            snakegame.AfficherFruit(0, levelcanvas);
+
+
         }
     }
 }
